@@ -153,7 +153,7 @@ fun ElectionListPreview() {
     ElectionsList(
         listOf(
             Election("100", "Election 1", "2023-01-01", "ocd 1"),
-            Election("100", "Election 1", "2023-01-01", "ocd 2")
+            Election("100", "Election 1", "2023-01-01", "ocd 3")
         ),
         Modifier.fillMaxWidth()
     )
