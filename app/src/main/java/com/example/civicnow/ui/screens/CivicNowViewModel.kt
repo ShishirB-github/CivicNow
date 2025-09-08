@@ -8,13 +8,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.civicnow.BuildConfig
 import com.example.civicnow.network.Election
 import com.example.civicnow.network.ElectionsApi
+import com.example.civicnow.network.EventData
+import com.example.civicnow.network.EventsApi
 import com.example.civicnow.network.Officeholder
 import com.example.civicnow.network.PeoplesApi
 import java.io.IOException
 import kotlinx.coroutines.launch
 
 sealed interface CivicNowUiState {
-    data class Success(val elections: List<Election>, val officeholders: List<Officeholder>) : CivicNowUiState
+    data class Success(val elections: List<Election>, val officeholders: List<Officeholder>, val events: List<EventData>) : CivicNowUiState
     object Error : CivicNowUiState
     object Loading : CivicNowUiState
 }
@@ -41,7 +43,9 @@ class CivicNowViewModel : ViewModel() {
                     lat = "37.70423",
                     long = "-121.91635")
 
-                civicNowUiState = CivicNowUiState.Success(electionsResponse.elections, peoplesResponse.results)
+                val eventsResponse = EventsApi.retrofitService.getEvents("Nevada")
+
+                civicNowUiState = CivicNowUiState.Success(electionsResponse.elections, peoplesResponse.results, eventsResponse.results)
             }
         } catch (e: IOException) {
             civicNowUiState = CivicNowUiState.Error

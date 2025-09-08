@@ -1,6 +1,5 @@
 package com.example.civicnow.ui.screens
 
-import android.content.Context
 import android.view.ViewGroup
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -26,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -40,6 +38,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.civicnow.R
 import com.example.civicnow.network.CurrentRole
+import com.example.civicnow.network.EventJurisdiction
 import com.example.civicnow.network.Jurisdiction
 import com.example.civicnow.network.Officeholder
 import java.net.URLEncoder

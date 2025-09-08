@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.civicnow.ui.screens.CivicNowViewModel
 import com.example.civicnow.R
 import com.example.civicnow.ui.screens.ElectionScreen
+import com.example.civicnow.ui.screens.EventsScreen
 import com.example.civicnow.ui.screens.OfficeholdersScreen
 import com.example.civicnow.ui.screens.WebViewScreen
 import java.net.URLDecoder
@@ -39,6 +41,8 @@ sealed class Destination (val route: String, val label: String, val icon: ImageV
 {
     object Home : Destination ("home", "Home", Icons.Default.Home)
     object OfficeHolders: Destination ("officeHolders", "Officeholders", Icons.Default.AccountCircle)
+
+    object Events: Destination ("events", "Events", Icons.Default.LocationOn)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,7 +54,8 @@ fun CivicNowApp() {
     val currentRoute = backStackEntry?.destination?.route ?: Destination.Home.route
     val currentScreen = when (currentRoute) {
         Destination.Home.route -> Destination.Home.label
-        else -> Destination.OfficeHolders.label
+        Destination.OfficeHolders.route -> Destination.OfficeHolders.label
+        else -> Destination.Events.label
     }
 
     val civicNowViewModel: CivicNowViewModel = viewModel()
@@ -76,6 +81,13 @@ fun CivicNowApp() {
 
                 composable(Destination.OfficeHolders.route) {
                     OfficeholdersScreen(
+                        civicNowUiState = civicNowViewModel.civicNowUiState,
+                        navController = navController
+                    )
+                }
+
+                composable(Destination.Events.route) {
+                    EventsScreen(
                         civicNowUiState = civicNowViewModel.civicNowUiState,
                         navController = navController
                     )
@@ -117,7 +129,8 @@ fun BottomNavigationBar(navController: NavHostController) {
     NavigationBar {
         val navItems = listOf(
             Destination.Home,
-            Destination.OfficeHolders
+            Destination.OfficeHolders,
+            Destination.Events
         )
 
         navItems.forEach { item ->
