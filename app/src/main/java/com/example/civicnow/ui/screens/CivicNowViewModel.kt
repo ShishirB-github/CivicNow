@@ -17,9 +17,20 @@ import java.io.IOException
 import kotlinx.coroutines.launch
 
 sealed interface CivicNowUiState {
-    data class Success(val elections: List<Election>, val officeholders: List<Officeholder>, val events: List<EventData>) : CivicNowUiState
-    object Error : CivicNowUiState
-    object Loading : CivicNowUiState
+    val elections: List<Election>
+    val officeholders: List<Officeholder>
+    val events: List<EventData>
+    data class Success(override val elections: List<Election>, override val officeholders: List<Officeholder>, override val events: List<EventData>) : CivicNowUiState
+    object Error : CivicNowUiState {
+        override val elections: List<Election> = emptyList()
+        override val officeholders: List<Officeholder>  = emptyList()
+        override val events: List<EventData>  = emptyList()
+    }
+    object Loading : CivicNowUiState {
+        override val elections: List<Election> = emptyList()
+        override val officeholders: List<Officeholder>  = emptyList()
+        override val events: List<EventData>  = emptyList()
+    }
 }
 
 class CivicNowViewModel : ViewModel() {
@@ -71,7 +82,7 @@ class CivicNowViewModel : ViewModel() {
                     long = latLongResult.items[0].position.lng.toString()
                 )
 
-                civicNowUiState = CivicNowUiState.Success(emptyList(), peoplesResponse.results, emptyList())
+                civicNowUiState = CivicNowUiState.Success(civicNowUiState.elections, peoplesResponse.results, civicNowUiState.events)
             }
         } catch (e: IOException) {
             civicNowUiState = CivicNowUiState.Error
