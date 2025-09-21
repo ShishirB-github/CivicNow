@@ -39,6 +39,7 @@ android {
         defaultConfig {
             // ... other defaultConfig
             buildConfigField("String", "ELECTIONS_API_KEY", "\"${getApiKey("ELECTIONS_API_KEY")}\"")
+            buildConfigField("String", "GEOCODE_API_KEY", "\"${getApiKey("GEOCODE_API_KEY")}\"")
             buildConfigField(
                 "String",
                 "OFFICEHOLDERS_API_KEY",

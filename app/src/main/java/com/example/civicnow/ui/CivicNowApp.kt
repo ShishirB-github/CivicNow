@@ -82,7 +82,8 @@ fun CivicNowApp() {
                 composable(Destination.OfficeHolders.route) {
                     OfficeholdersScreen(
                         civicNowUiState = civicNowViewModel.civicNowUiState,
-                        navController = navController
+                        navController = navController,
+                        fetchOfficeHoldersForZip = civicNowViewModel::fetchOfficeHoldersForZip
                     )
                 }
 

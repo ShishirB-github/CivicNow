@@ -10,6 +10,7 @@ import com.example.civicnow.network.Election
 import com.example.civicnow.network.ElectionsApi
 import com.example.civicnow.network.EventData
 import com.example.civicnow.network.EventsApi
+import com.example.civicnow.network.GeocodeApi
 import com.example.civicnow.network.Officeholder
 import com.example.civicnow.network.PeoplesApi
 import java.io.IOException
@@ -39,13 +40,38 @@ class CivicNowViewModel : ViewModel() {
                 val electionsResponse =
                     ElectionsApi.retrofitService.getElections(BuildConfig.ELECTIONS_API_KEY)
 
+                val latLongResult = GeocodeApi.retrofitService.getLatLong(
+                    address = "94568 United States",
+                    apiKey = BuildConfig.GEOCODE_API_KEY
+                )
+
                 val peoplesResponse = PeoplesApi.retrofitService.getPeoples(
-                    lat = "37.70423",
-                    long = "-121.91635")
+                    lat = latLongResult.items[0].position.lat.toString(),
+                    long = latLongResult.items[0].position.lng.toString())
 
                 val eventsResponse = EventsApi.retrofitService.getEvents("Nevada")
 
                 civicNowUiState = CivicNowUiState.Success(electionsResponse.elections, peoplesResponse.results, eventsResponse.results)
+            }
+        } catch (e: IOException) {
+            civicNowUiState = CivicNowUiState.Error
+        }
+    }
+
+    fun fetchOfficeHoldersForZip(zipCode: String) {
+        try {
+            viewModelScope.launch {
+                val latLongResult = GeocodeApi.retrofitService.getLatLong(
+                    address = zipCode + " United States",
+                    apiKey = BuildConfig.GEOCODE_API_KEY
+                )
+
+                val peoplesResponse = PeoplesApi.retrofitService.getPeoples(
+                    lat = latLongResult.items[0].position.lat.toString(),
+                    long = latLongResult.items[0].position.lng.toString()
+                )
+
+                civicNowUiState = CivicNowUiState.Success(emptyList(), peoplesResponse.results, emptyList())
             }
         } catch (e: IOException) {
             civicNowUiState = CivicNowUiState.Error
