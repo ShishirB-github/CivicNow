@@ -1,8 +1,6 @@
 package com.example.civicnow.ui.screens
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,36 +14,35 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.example.civicnow.R
 import com.example.civicnow.network.EventData
 import com.example.civicnow.network.EventJurisdiction
 import com.example.civicnow.network.Location
-import com.example.civicnow.network.Officeholder
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import java.time.Instant
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
 import java.util.TimeZone
 
 @Composable
@@ -53,11 +50,12 @@ fun EventsScreen(
     civicNowUiState: CivicNowUiState,
     modifier: Modifier = Modifier,
     navController: NavHostController,
+    fetchEventsForJurisdiction: (String) -> Unit
 ) {
     when (civicNowUiState) {
         is CivicNowUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
         is CivicNowUiState.Success -> EventsResultScreen(
-            civicNowUiState.events, navController = navController, modifier = modifier.fillMaxWidth()
+            civicNowUiState.events, navController = navController, fetchEventsForJurisdiction = fetchEventsForJurisdiction, modifier = modifier.fillMaxWidth()
         )
 
         is CivicNowUiState.Error -> ErrorScreen(modifier = modifier.fillMaxSize())
@@ -65,11 +63,13 @@ fun EventsScreen(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventsResultScreen(
     events: List<EventData>,
     modifier: Modifier = Modifier,
-    navController: NavHostController
+    navController: NavHostController,
+    fetchEventsForJurisdiction: (String) -> Unit
 ) {
     val layoutDirection = LocalLayoutDirection.current
     Surface(
@@ -87,13 +87,62 @@ fun EventsResultScreen(
             Text(text = stringResource(R.string.no_results))
             return@Surface
         }
+
         Column(modifier = modifier) {
-            Text(
-                text = "Success: ${events.size} Events retrieved",
-                modifier = Modifier.padding(8.dp),
-                style = MaterialTheme.typography.titleLarge
-            )
-            EventsList(events = events, navController = navController, modifier = Modifier.padding(8.dp),)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp) // spacing between elements
+            ) {
+                var isExpanded by remember { mutableStateOf(false) }
+                // This would be your list of available jurisdictions
+                val jurisdictions = listOf("Nevada", "California", "New York")
+                var selectedJurisdiction by remember { mutableStateOf(jurisdictions[0]) }
+
+                // We use a Box to anchor the dropdown menu to the text field
+                ExposedDropdownMenuBox(
+                    expanded = isExpanded,
+                    onExpandedChange = { isExpanded = it },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    TextField(
+                        value = selectedJurisdiction,
+                        onValueChange = {}, // onValueChange is not used for a read-only dropdown
+                        readOnly = true,
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
+                        },
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                        modifier = Modifier.menuAnchor() // This is important!
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = isExpanded,
+                        onDismissRequest = { isExpanded = false }
+                    ) {
+                        jurisdictions.forEach { jurisdiction ->
+                            DropdownMenuItem(
+                                text = { Text(jurisdiction) },
+                                onClick = {
+                                    selectedJurisdiction = jurisdiction
+                                    isExpanded = false
+                                    // fetchEventsForJurisdiction(jurisdiction) // Optionally fetch on selection
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Button(
+                    onClick = { fetchEventsForJurisdiction(selectedJurisdiction) },
+                    // modifier = Modifier.alignByBaseline() // alignByBaseline might not work as expected with the Box, align to center instead
+                ) {
+                    Text(text = stringResource(R.string.submit))
+                }
+            }
+
+            EventsList(events = events, navController = navController, modifier = Modifier.padding(8.dp))
         }
     }
 }

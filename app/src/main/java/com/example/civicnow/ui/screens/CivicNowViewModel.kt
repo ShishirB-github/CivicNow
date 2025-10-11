@@ -48,18 +48,20 @@ class CivicNowViewModel : ViewModel() {
     private fun fetchData() {
         try {
             viewModelScope.launch {
+                // fetch Elections
                 val electionsResponse =
                     ElectionsApi.retrofitService.getElections(BuildConfig.ELECTIONS_API_KEY)
 
+                // fetch Officeholders
                 val latLongResult = GeocodeApi.retrofitService.getLatLong(
                     address = "94568 United States",
                     apiKey = BuildConfig.GEOCODE_API_KEY
                 )
-
                 val peoplesResponse = PeoplesApi.retrofitService.getPeoples(
                     lat = latLongResult.items[0].position.lat.toString(),
                     long = latLongResult.items[0].position.lng.toString())
 
+                // fetch Events
                 val eventsResponse = EventsApi.retrofitService.getEvents("Nevada")
 
                 civicNowUiState = CivicNowUiState.Success(electionsResponse.elections, peoplesResponse.results, eventsResponse.results)
@@ -83,6 +85,18 @@ class CivicNowViewModel : ViewModel() {
                 )
 
                 civicNowUiState = CivicNowUiState.Success(civicNowUiState.elections, peoplesResponse.results, civicNowUiState.events)
+            }
+        } catch (e: IOException) {
+            civicNowUiState = CivicNowUiState.Error
+        }
+    }
+
+    fun fetchEventsForJurisdiction(jurisdiction: String) {
+        try {
+            viewModelScope.launch {
+                val eventsResponse = EventsApi.retrofitService.getEvents(jurisdiction)
+
+                civicNowUiState = CivicNowUiState.Success(civicNowUiState.elections, civicNowUiState.officeholders, eventsResponse.results)
             }
         } catch (e: IOException) {
             civicNowUiState = CivicNowUiState.Error

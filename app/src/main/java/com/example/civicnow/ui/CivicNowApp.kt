@@ -90,7 +90,8 @@ fun CivicNowApp() {
                 composable(Destination.Events.route) {
                     EventsScreen(
                         civicNowUiState = civicNowViewModel.civicNowUiState,
-                        navController = navController
+                        navController = navController,
+                        fetchEventsForJurisdiction = civicNowViewModel::fetchEventsForJurisdiction
                     )
                 }
 
