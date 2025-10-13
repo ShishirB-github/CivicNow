@@ -3,6 +3,7 @@ package com.example.civicnow.ui.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -15,7 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.HowToVote
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -106,21 +111,38 @@ fun ErrorScreen(modifier: Modifier = Modifier) {
 
 @Composable
 fun ElectionCard(election: Election, modifier: Modifier = Modifier) {
-    Card(modifier = modifier.fillMaxWidth()) {
-        Column {
-            Text(
-                text = election.name,
-                modifier = Modifier.padding(8.dp),
-                style = MaterialTheme.typography.titleLarge
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp, horizontal = 8.dp), // Add horizontal padding
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp), // More padding inside the card
+            verticalAlignment = Alignment.CenterVertically // Align icon and text vertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.HowToVote,
+                contentDescription = "Election",
+                modifier = Modifier.size(40.dp),
+                tint = MaterialTheme.colorScheme.primary
             )
-            Text(
-                text = election.electionDay,
-                modifier = Modifier.padding(8.dp),
-                style = MaterialTheme.typography.titleMedium
-            )
+
+            Column(modifier = Modifier.padding(start = 16.dp)) {
+                Text(
+                    text = election.name,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface // Use theme colors
+                )
+                Text(
+                    text = "Date: ${election.electionDay}",
+                    modifier = Modifier.padding(top = 4.dp), // A little space between title and date
+                    style = MaterialTheme.typography.bodyLarge, // Use bodyLarge for secondary info
+                    color = MaterialTheme.colorScheme.onSurfaceVariant // A softer color
+                )
+            }
         }
-    }
-}
+    }}
 
 @Composable
 fun ElectionsList(elections: List<Election>, modifier: Modifier = Modifier) {

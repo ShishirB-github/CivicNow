@@ -4,9 +4,11 @@ import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Ballot
+import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -29,8 +31,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.civicnow.ui.screens.CivicNowViewModel
 import com.example.civicnow.R
+import com.example.civicnow.ui.screens.CivicNowViewModel
 import com.example.civicnow.ui.screens.ElectionScreen
 import com.example.civicnow.ui.screens.EventsScreen
 import com.example.civicnow.ui.screens.OfficeholdersScreen
@@ -40,9 +42,9 @@ import java.nio.charset.StandardCharsets
 
 sealed class Destination (val route: String, val label: String, val icon: ImageVector)
 {
-    object Elections : Destination ("elections", "Elections", Icons.Default.Home)
-    object OfficeHolders: Destination ("officeHolders", "Officeholders", Icons.Default.AccountCircle)
-    object Events: Destination ("events", "Events", Icons.Default.DateRange)
+    object OfficeHolders: Destination ("officeHolders", "Officeholders", Icons.Filled.Gavel)
+    object Events: Destination ("events", "Events", Icons.Filled.Campaign)
+    object Elections : Destination ("elections", "Elections", Icons.Filled.Ballot)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
