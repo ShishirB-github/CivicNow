@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -39,10 +40,9 @@ import java.nio.charset.StandardCharsets
 
 sealed class Destination (val route: String, val label: String, val icon: ImageVector)
 {
-    object Home : Destination ("home", "Home", Icons.Default.Home)
+    object Elections : Destination ("elections", "Elections", Icons.Default.Home)
     object OfficeHolders: Destination ("officeHolders", "Officeholders", Icons.Default.AccountCircle)
-
-    object Events: Destination ("events", "Events", Icons.Default.LocationOn)
+    object Events: Destination ("events", "Events", Icons.Default.DateRange)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,9 +51,9 @@ fun CivicNowApp() {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = backStackEntry?.destination?.route ?: Destination.Home.route
+    val currentRoute = backStackEntry?.destination?.route ?: Destination.OfficeHolders.route
     val currentScreen = when (currentRoute) {
-        Destination.Home.route -> Destination.Home.label
+        Destination.Elections.route -> Destination.Elections.label
         Destination.OfficeHolders.route -> Destination.OfficeHolders.label
         else -> Destination.Events.label
     }
@@ -72,13 +72,9 @@ fun CivicNowApp() {
     ) { innerPadding ->
             NavHost(
                 navController = navController,
-                startDestination = Destination.Home.route,
+                startDestination = Destination.OfficeHolders.route,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                composable(Destination.Home.route) {
-                    ElectionScreen(civicNowUiState = civicNowViewModel.civicNowUiState)
-                }
-
                 composable(Destination.OfficeHolders.route) {
                     OfficeholdersScreen(
                         civicNowUiState = civicNowViewModel.civicNowUiState,
@@ -93,6 +89,10 @@ fun CivicNowApp() {
                         navController = navController,
                         fetchEventsForJurisdiction = civicNowViewModel::fetchEventsForJurisdiction
                     )
+                }
+
+                composable(Destination.Elections.route) {
+                    ElectionScreen(civicNowUiState = civicNowViewModel.civicNowUiState)
                 }
 
                 composable("webview_route/{url}") { backStackEntry ->
@@ -130,9 +130,9 @@ fun BottomNavigationBar(navController: NavHostController) {
 
     NavigationBar {
         val navItems = listOf(
-            Destination.Home,
             Destination.OfficeHolders,
-            Destination.Events
+            Destination.Events,
+            Destination.Elections,
         )
 
         navItems.forEach { item ->

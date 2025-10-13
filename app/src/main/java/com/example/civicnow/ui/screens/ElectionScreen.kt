@@ -68,11 +68,6 @@ fun ElectionsResultScreen(elections: List<Election>, modifier: Modifier = Modifi
             return@Surface
         }
         Column(modifier = modifier) {
-            Text(
-                text = "Success: ${elections.size} Elections retrieved",
-                modifier = Modifier.padding(8.dp),
-                style = MaterialTheme.typography.titleLarge
-            )
             ElectionsList(elections = elections, modifier = Modifier.padding(8.dp))
         }
     }
