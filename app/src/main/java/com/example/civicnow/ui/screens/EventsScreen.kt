@@ -13,15 +13,24 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -31,10 +40,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -43,6 +55,7 @@ import com.example.civicnow.network.EventData
 import com.example.civicnow.network.EventJurisdiction
 import com.example.civicnow.network.Location
 import java.time.Instant
+import java.time.format.DateTimeFormatter
 import java.util.TimeZone
 
 @Composable
@@ -108,7 +121,7 @@ fun EventsResultScreen(
                     "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington",
                     "West Virginia", "Wisconsin", "Wyoming"
                 )
-                var selectedJurisdiction by remember { mutableStateOf(jurisdictions[0]) }
+                var selectedJurisdiction by remember { mutableStateOf("California") }
 
                 // We use a Box to anchor the dropdown menu to the text field
                 ExposedDropdownMenuBox(
@@ -159,64 +172,87 @@ fun EventsResultScreen(
 
 @Composable
 fun EventCard(event: EventData, navController: NavHostController, modifier: Modifier = Modifier) {
+    // Helper function to format date and time, now moved inside the card
     fun getDateTime(dateString: String): Pair<String, String> {
-        if (dateString.isEmpty()) return Pair("NA", "")
-        
-        val instant = Instant.parse(dateString)
-        val localDate = instant.atZone(TimeZone.getDefault().toZoneId()).toLocalDate()
-        val localTime = instant.atZone(TimeZone.getDefault().toZoneId()).toLocalTime()
-        return Pair(localDate.toString(), localTime.toString())
+        if (dateString.isEmpty()) return Pair("N/A", "")
+
+        return try {
+            val instant = Instant.parse(dateString)
+            val zonedDateTime = instant.atZone(TimeZone.getDefault().toZoneId())
+            val date = zonedDateTime.toLocalDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
+            val time = zonedDateTime.toLocalTime().format(DateTimeFormatter.ofPattern("h:mm a"))
+            Pair(date, time)
+        } catch (e: Exception) {
+            Pair(dateString, "") // Fallback to raw string if parsing fails
+        }
     }
 
-    Card(modifier = modifier.fillMaxWidth()) {
-        Row {
-            Column {
-                Text(
-                    text = event.name,
-                    modifier = Modifier.padding(2.dp),
-                    style = MaterialTheme.typography.titleLarge
-                )
-                Text(
-                    text = event.description,
-                    modifier = Modifier.padding(2.dp),
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            // --- HEADER ---
+            Text(
+                text = event.name,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = event.description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp)
+            )
 
-                Text(
-                    text = buildString {
-                        append("Start Date: ")
-                        val dateTime = getDateTime(event.startDate)
-                        append(dateTime.first)
-                        append(" ")
-                        append(dateTime.second)
-                    },
-                    modifier = Modifier.padding(2.dp),
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Text(
-                    text = buildString {
-                        append("End Date: ")
-                        val dateTime = getDateTime(event.endDate)
-                        append(dateTime.first)
-                        append(" ")
-                        append(dateTime.second)
-                    },
-                    modifier = Modifier.padding(2.dp),
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Text(
-                    text = "Status: " + event.status,
-                    modifier = Modifier.padding(2.dp),
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Text(
-                    text = "Location: " + event.location.name,
-                    modifier = Modifier.padding(2.dp),
-                    style = MaterialTheme.typography.titleMedium
-                )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // --- DETAILS SECTION ---
+            val (startDate, startTime) = getDateTime(event.startDate)
+            val (endDate, endTime) = getDateTime(event.endDate)
+
+            // Start Date and Time
+            DetailRow(icon = Icons.Default.CalendarToday, text = "Starts: $startDate")
+            // End Date and Time
+            if (startDate != endDate) {
+                DetailRow(icon = Icons.Default.Schedule, text = "Ends: $endDate")
             }
+            // Location
+            DetailRow(icon = Icons.Default.LocationOn, text = event.location.name)
+            // Status
+            DetailRow(icon = Icons.Default.Info, text = "Status: ${event.status.replaceFirstChar { it.titlecase() }}")
         }
+    }
+}
+
+/**
+ * A helper composable to create a consistent row with an icon and text.
+ * This improves reusability and ensures all detail lines look the same.
+ */
+@Composable
+private fun DetailRow(icon: ImageVector, text: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(vertical = 4.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null, // Decorative icon
+            modifier = Modifier.size(16.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 

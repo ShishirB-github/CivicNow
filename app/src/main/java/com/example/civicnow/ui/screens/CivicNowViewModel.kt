@@ -62,7 +62,7 @@ class CivicNowViewModel : ViewModel() {
                     long = latLongResult.items[0].position.lng.toString())
 
                 // fetch Events
-                val eventsResponse = EventsApi.retrofitService.getEvents("Nevada")
+                val eventsResponse = EventsApi.retrofitService.getEvents("California")
 
                 civicNowUiState = CivicNowUiState.Success(electionsResponse.elections, peoplesResponse.results, eventsResponse.results)
             }
