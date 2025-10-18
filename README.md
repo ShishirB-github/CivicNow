@@ -5,6 +5,6 @@ Android app that shows current Elections, Officeholders, and Events in your loca
 <img width="108" height="210" alt="Image" src="https://github.com/user-attachments/assets/6f18ad7d-970b-4b0e-85b1-1a1b4948ad01" />
 <img width="108" height="210" alt="Image" src="https://github.com/user-attachments/assets/0f74b402-5bf5-4613-9f21-2d301fbc2833" />
 
-![Image](https://github.com/user-attachments/assets/fb01c9b5-72ea-43ba-9bc8-2fe458f36fd6)
+![Image](https://github.com/user-attachments/assets/a34dcccd-878b-4742-bfe9-00fe9d567a50)
 
 Download Link- [https://drive.google.com/file/d/1g_M63Jgkes--FzZjCi2Ucbq0aKrkDhKS/view?usp=sharing](url)
