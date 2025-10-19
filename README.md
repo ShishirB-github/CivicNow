@@ -7,4 +7,4 @@ Android app that shows current Elections, Officeholders, and Events in your loca
 
 ![Image](https://github.com/user-attachments/assets/a34dcccd-878b-4742-bfe9-00fe9d567a50)
 
-APK Link- [https://drive.google.com/file/d/1g_M63Jgkes--FzZjCi2Ucbq0aKrkDhKS/view?usp=sharing](https://github.com/ShishirB-github/CivicNow/blob/main/url)
+APK Link- [https://drive.google.com/file/d/1g_M63Jgkes--FzZjCi2Ucbq0aKrkDhKS/view?usp=sharing](https://drive.google.com/file/d/1g_M63Jgkes--FzZjCi2Ucbq0aKrkDhKS/view?usp=sharing)
